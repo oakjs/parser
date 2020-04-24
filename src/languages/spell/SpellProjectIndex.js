@@ -7,29 +7,29 @@ import { SpellProject } from "./SpellProject"
 import { SpellFile } from "./SpellFile"
 
 /**
- * Manifest of files for a given `SpellProject`.
+ * Index of imports for a given `SpellProject`.
  *
  * Note that these are singleton instances --
  * you'll always get the same object back for a given `path`.
  */
-export class SpellProjectManifest extends JSON5File {
+export class SpellProjectIndex extends JSON5File {
   /** Registry of known instances. */
   static registry = new Map()
   constructor(path) {
     // Create instance if not already present in registry
-    if (!SpellProjectManifest.registry.has(path)) {
+    if (!SpellProjectIndex.registry.has(path)) {
       const instance = super({ path })
       if (!instance.location.isValidProjectPath)
-        throw new TypeError(`SpellProjectManifest initialized with invalid path '${this.path}'`)
-      SpellProjectManifest.registry.set(path, instance)
+        throw new TypeError(`SpellProjectIndex initialized with invalid path '${this.path}'`)
+      SpellProjectIndex.registry.set(path, instance)
     }
-    return SpellProjectManifest.registry.get(path)
+    return SpellProjectIndex.registry.get(path)
   }
 
   /** We've been removed from the server -- clean up memory, etc.. */
   cleanUpOnRemove() {
-    if (this.isLoaded) this.files.forEach(file => file.cleanUpOnRemove())
-    SpellProjectManifest.registry.clear(this.path)
+    // NOTE: we don't clean up files, we let the Manifest do that.
+    SpellProjectIndex.registry.clear(this.path)
   }
 
   /**
@@ -58,10 +58,9 @@ export class SpellProjectManifest extends JSON5File {
    * Return list of `SpellFiles` in the index.
    * Returns `undefined` if we're not loaded or manifest is malformed.
    */
-  @computed get files() {
-    if (!this.isLoaded) console.warn("SpellProjectManifest(): Attempting to get list of files before loading.")
-    console.warn("recalculating files", this.contents)
-    return this.contents?.files?.map(({ path }) => new SpellFile(path))
+  @computed get imports() {
+    if (!this.isLoaded) console.warn("SpellProjectIndex(): Attempting to get list of imports before loading.")
+    return this.contents?.imports?.map(({ path }) => new SpellFile(path))
   }
 
   //----------------------------
@@ -70,7 +69,7 @@ export class SpellProjectManifest extends JSON5File {
 
   /** Derive `url` from our path if not explicitly set. */
   @overrideable get url() {
-    return `/api${this.path}/.manifest`
+    return `/api${this.path}/.index`
   }
 
   /**
@@ -79,10 +78,10 @@ export class SpellProjectManifest extends JSON5File {
    */
   async loadAll() {
     await this.load()
-    const { files } = this
-    await Promise.allSettled(files.map(file => file.load()))
-    return files
+    const { imports } = this
+    await Promise.allSettled(imports.map(file => file.load()))
+    return imports
   }
 }
 
-global.SpellProjectManifest = SpellProjectManifest
+global.SpellProjectIndex = SpellProjectIndex
