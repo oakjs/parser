@@ -35,7 +35,7 @@
     "browser-or-node": "^1.1.0",
     "chalk": "^2.4.2",
     "classnames": "^2.2.6",
-    "codemirror": "^5.48.2",
+    "codemirror": "^5.58.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "express": "^4.16.4",
