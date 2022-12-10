@@ -38,7 +38,7 @@
     "codemirror": "^5.48.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "express-json5": "^0.1.0",
     "fs-extra": "^7.0.1",
     "global": "^4.3.2",
